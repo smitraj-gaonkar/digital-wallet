@@ -26,7 +26,5 @@ public class BankAccountService {
     public Optional<BankAccount> getByAccountNumberAndBankCode(Long accountNumber, String bankCode) {
         return bankAccountRepository.findByAccountNumberAndBankCode(accountNumber, bankCode);
     }
-
-    
-    
+ 
 }

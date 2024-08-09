@@ -1,10 +1,5 @@
 package com.example.wallet.dto;
 
-import java.util.List;
-
-import javax.persistence.*;
-
-import com.example.wallet.enitites.BankAccount;
 import com.example.wallet.enitites.UserAccount;
 
 import lombok.*;

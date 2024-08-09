@@ -7,6 +7,7 @@ import com.example.wallet.enitites.BankAccount;
 import com.example.wallet.enitites.UserAccount;
 import com.example.wallet.service.BankAccountService;
 import com.example.wallet.service.UserAccountService;
+import com.example.wallet.service.WalletService;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,9 @@ public class UserAccountController {
     @Autowired
     BankAccountService bankAccountService;
 
+    @Autowired
+    WalletService walletService;
+
     @PostMapping("/userAccount")
     public ResponseEntity<String> register (@RequestBody UserAccountDTO userAccountDTO) {
         if(userAccountService.getByEmail(userAccountDTO.getEmail()).isPresent()) {
@@ -38,7 +42,9 @@ public class UserAccountController {
         if(userAccountService.getByMobile(userAccountDTO.getMobile()).isPresent()) {
             return new ResponseEntity<>("User account already exists with mobile: " + userAccountDTO.getMobile(), HttpStatus.BAD_REQUEST);
         }
-        userAccountService.create(userAccountDTO.mapToUserAccount());
+        UserAccount userAccount = userAccountService.create(userAccountDTO.mapToUserAccount());
+        userAccount.setWallet(walletService.activateWallet(userAccount));
+        userAccountService.create(userAccount);
         return new ResponseEntity<>("User account created successfully", HttpStatus.OK);
     }
 
@@ -97,8 +103,7 @@ public class UserAccountController {
         bankAccountService.create(bankAccount.get());
         userAccount.get().getBankAccounts().remove(bankAccount.get());
         userAccountService.create(userAccount.get());
-        return new ResponseEntity<>("User & Bank account found/verified. Bank account removed successfully. ", HttpStatus.OK);
-        
+        return new ResponseEntity<>("User & Bank account found/verified. Bank account removed successfully. ", HttpStatus.OK);     
     }
     
 }

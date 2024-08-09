@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.wallet.enitites.BankAccount;
 import com.example.wallet.enitites.UserAccount;
 import com.example.wallet.repository.UserAccountRepository;
 
@@ -16,8 +15,8 @@ public class UserAccountService {
     @Autowired
     UserAccountRepository userAccountRepository;
 
-    public void create(UserAccount userAccount) {
-        userAccountRepository.save(userAccount);
+    public UserAccount create(UserAccount userAccount) {
+        return userAccountRepository.save(userAccount);
     }
 
     public Optional<UserAccount> getByUserAccountId(Long id) {
@@ -34,10 +33,6 @@ public class UserAccountService {
 
     public List<UserAccount> getAll() {
         return userAccountRepository.findAll();
-    }
-
-    public void addBankAccount(Long id, List<BankAccount> bankAccounts) {
-        userAccountRepository.updateBankAccounts(id, bankAccounts);
     }
     
 }

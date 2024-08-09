@@ -27,4 +27,16 @@ public class BankAccount {
     // @JoinColumn(name = "user_id")
     private Long userId;
 
+    public Double credit(Double amount) {
+        this.balance += amount;
+        return this.balance;
+    }
+
+    public Double debit(Double amount) {
+        if(this.balance>=amount) {
+            this.balance -= amount;
+        }
+        return this.balance;
+    }
+
 }
