@@ -12,5 +12,5 @@ public class BaseController {
     public ResponseEntity<String> baseContext() {
         return new ResponseEntity<>("Digital Wallet", HttpStatus.OK);
     }
-    
+
 }
