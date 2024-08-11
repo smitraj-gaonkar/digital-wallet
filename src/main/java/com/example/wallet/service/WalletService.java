@@ -3,6 +3,7 @@ package com.example.wallet.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.wallet.enitites.Account;
 import com.example.wallet.enitites.BankAccount;
 import com.example.wallet.enitites.UserAccount;
 import com.example.wallet.enitites.Wallet;
@@ -22,8 +23,8 @@ public class WalletService {
     @Autowired
     WalletRepository walletRepository;
 
-    public Wallet activateWallet(UserAccount userAccount) {
-        return walletRepository.save(new Wallet(Double.valueOf(0.0), userAccount.getId()));
+    public Wallet activateWallet(Account account) {
+        return walletRepository.save(new Wallet(Double.valueOf(1000.0), account.getId()));
     }
     
 
@@ -50,7 +51,7 @@ public class WalletService {
     }
 
     //Transfer to wallet: From own wallet to other's wallet
-    public Double transferToWallet(UserAccount payerAccount, UserAccount payeeAccount, Double amount) {
+    public Double transferToWallet(Account payerAccount, Account payeeAccount, Double amount) {
         walletRepository.updateWalletBalance(
             payerAccount.getWallet().getId(),
             payerAccount.getWallet().debit(amount));

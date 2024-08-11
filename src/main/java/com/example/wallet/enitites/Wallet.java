@@ -24,7 +24,7 @@ public class Wallet {
     private Double balance;
 
     // @OneToOne
-    // @JoinColumn
+    // @JoinColumn(name = "user_id")
     private Long userId;
     // private UserAccount userAccount;
     
