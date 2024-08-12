@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.wallet.enitites.Bill;
 import com.example.wallet.enitites.MerchantAccount;
+import com.example.wallet.enitites.Offer;
 import com.example.wallet.enitites.Transaction;
 import com.example.wallet.enitites.UserAccount;
 import com.example.wallet.enums.BillStatus;
@@ -11,6 +12,7 @@ import com.example.wallet.enums.Status;
 import com.example.wallet.enums.TransactionType;
 import com.example.wallet.service.BillService;
 import com.example.wallet.service.MerchantAccountService;
+import com.example.wallet.service.OfferService;
 import com.example.wallet.service.TransactionService;
 import com.example.wallet.service.UserAccountService;
 import com.example.wallet.service.WalletService;
@@ -45,6 +47,9 @@ public class BillController {
 
     @Autowired
     TransactionService transactionService;
+
+    @Autowired
+    OfferService offerService;
 
     @GetMapping("/bills")
     public ResponseEntity<?> getAll() {
@@ -110,7 +115,8 @@ public class BillController {
     @PutMapping("userAccount/{userAccountId}/payBill/{consumerId}")
     public ResponseEntity<?> payBill(
         @PathVariable Long userAccountId,
-        @PathVariable Long consumerId) {
+        @PathVariable Long consumerId,
+        @RequestParam String offerCode) {
 
         Status status = Status.FAILED;
         String info = "BILL PAYMENT. Consumer id: " + consumerId;
@@ -130,10 +136,27 @@ public class BillController {
                 message = "Insufficient Balance in wallet. Available balance: " + userAccount.get().getWallet().getBalance();
                 httpStatus = HttpStatus.BAD_REQUEST;
             } else {
+                Double discount = 0.00;
+                String discountMessage = "";
+                if(offerCode!=null) {
+                    if(offerCode!="") {
+                        Optional<Offer> appliedOffer = offerService.getAll().stream().filter(offer -> offer.getCode().equals(offerCode)).findFirst();
+                        Date todaysDate = new Date();
+                        if( appliedOffer.isPresent() && 
+                            todaysDate.compareTo(appliedOffer.get().getValidFrom())>=0 &&
+                            todaysDate.compareTo(appliedOffer.get().getValidTo())<=0  ) {
+                            
+                            discount = (bill.get().getAmount() * appliedOffer.get().getCashbackPercent())/100.00;
+                            discountMessage = " Offer Code: " + offerCode + ". Instant cashback of amount rs." + discount + " offer applied.";
+                        }
+                    }
+                }
+
                 MerchantAccount merchantAccount = merchantAccountService.getByName(bill.get().getMerchantName());
+                walletService.transferToWallet(userAccount.get(), merchantAccount, bill.get().getAmount()-discount);
                 billService.updateBillStatusAndPaymentDate(new Date(), BillStatus.PAID, bill.get().getId());
                 status = Status.SUCCESS;
-                message = "Bill paid successfully.";
+                message = "Bill paid successfully." + discountMessage;
                 httpStatus = HttpStatus.OK;
 
                 transactionService.create(new Transaction(

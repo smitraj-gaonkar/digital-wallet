@@ -1,5 +1,7 @@
 package com.example.wallet.initializer;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.example.wallet.enitites.BankAccount;
 import com.example.wallet.enitites.Bill;
 import com.example.wallet.enitites.MerchantAccount;
+import com.example.wallet.enitites.Offer;
 import com.example.wallet.enitites.Transaction;
 import com.example.wallet.enums.BillStatus;
 import com.example.wallet.enums.Status;
@@ -20,6 +23,7 @@ import com.example.wallet.enums.UtilityType;
 import com.example.wallet.repository.BankAccountRepository;
 import com.example.wallet.repository.BillRepository;
 import com.example.wallet.repository.MerchantAccountRepository;
+import com.example.wallet.repository.OfferRepository;
 import com.example.wallet.repository.TransactionRepository;
 import com.example.wallet.service.WalletService;
 
@@ -37,6 +41,9 @@ public class DatabaseInitializer {
 
     @Autowired
     private BillRepository billRepository;
+
+    @Autowired
+    private OfferRepository offerRepository;
 
     @Autowired
     private WalletService walletService;
@@ -88,6 +95,22 @@ public class DatabaseInitializer {
         billRepository.save(new Bill(Long.valueOf(3000002), UtilityType.MOBILE, new Date(), Double.valueOf(299), BillStatus.UNPAID, null, merchantAccountRepository.findByName("Jio").getId(),"Jio"));
         billRepository.save(new Bill(Long.valueOf(3000003), UtilityType.BROADBAND, new Date(), Double.valueOf(300), BillStatus.UNPAID, null, merchantAccountRepository.findByName("Jio").getId(),"Jio"));
         
+        Date validFromDate, validTodate;
+        try {
+
+            validFromDate = new SimpleDateFormat("dd-MMM-yyyy").parse("10-Aug-2024");
+            validTodate = new SimpleDateFormat("dd-MMM-yyyy").parse("15-Aug-2024");
+            offerRepository.save(new Offer("OFFXYZABC02", "INDIA", validFromDate, validTodate, 2.00));
+            offerRepository.save(new Offer("OFFXYZABC05", "INDIA", validFromDate, validFromDate, 5.00));
+            offerRepository.save(new Offer("OFFXYZABC10", "INDIA", validFromDate, validTodate, 10.00));
+            offerRepository.save(new Offer("OFFXYZABC15", "INDIA", validFromDate, validFromDate, 15.00));
+            offerRepository.save(new Offer("OFFXYZABC20", "INDIA", validFromDate, validTodate, 20.00));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        
+        
+        
         transactionRepository.save(
             new Transaction(
                 Long.valueOf(0),
@@ -101,5 +124,7 @@ public class DatabaseInitializer {
                 Long.valueOf(0)
             )
         );
+
+
     }
 }

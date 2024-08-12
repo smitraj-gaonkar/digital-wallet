@@ -28,7 +28,7 @@ import lombok.Setter;
 public class MerchantAccount extends Account{
 
     // @Id
-    // @GeneratedValue(strategy = GenerationType.)
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Column(unique = true)
